@@ -3,7 +3,6 @@ package net.alexandroid.googleplayservices;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,9 +23,9 @@ public class MainActivity extends AppCompatActivity implements
         LocationListener {
 
     public static final String TAG = "MainACtivity";
-    private TextView txtOutput;
+    private TextView tvLocation, tvActivity;
     private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
+    private boolean toggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,23 +33,37 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        tvLocation = (TextView) findViewById(R.id.tv_location);
+        tvActivity = (TextView) findViewById(R.id.tv_activity);
+        setFab();
+        buildGoogleApiClient();
+    }
 
+    private void setFab() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (toggle) {
+                    toggle = false;
+                    // Removed code
+
+
+                } else {
+                    toggle = true;
+                    // Add code
+                }
             }
         });
 
+    }
+
+    private void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-
-        txtOutput = (TextView) findViewById(R.id.textView);
     }
 
     @Override
@@ -61,18 +74,34 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
         super.onStop();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        mLocationRequest = LocationRequest.create();
+        // Location part 1
+        getLocationOnce();
+        // Location part 2
+        getLocationUpdates();
+    }
+
+    private void getLocationUpdates() {
+        LocationRequest mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    private void getLocationOnce() {
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation != null) {
+            // Do something with last location
+        }
     }
 
     @Override
@@ -82,46 +111,37 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.i(TAG, "onConnectionFailed");
-
+        Log.i(TAG, "onConnectionFailed: " + connectionResult.toString());
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        txtOutput.setText(
+        tvLocation.setText(
                 "Latitude: " + Double.toString(location.getLatitude()) + "\n" +
-                "Longitude: " + Double.toString(location.getLongitude()) + "\n" +
-                "Accuracy: " + location.getAccuracy() + "\n" +
-                "Provider: " + location.getProvider() + "\n" +
-                "Altitude: " + location.getAltitude() + "\n" +
-                "Bearing: " + location.getBearing() + "\n" +
-                "Speed: " + location.getSpeed() + "\n" +
-                "Time: " + location.getTime() + "\n"
+                        "Longitude: " + Double.toString(location.getLongitude()) + "\n" +
+                        "Accuracy: " + location.getAccuracy() + "\n" +
+                        "Provider: " + location.getProvider() + "\n" +
+                        "Altitude: " + location.getAltitude() + "\n" +
+                        "Bearing: " + location.getBearing() + "\n" +
+                        "Speed: " + location.getSpeed() + "\n" +
+                        "Time: " + location.getTime() + "\n"
         );
     }
 
 
     // MENU
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
