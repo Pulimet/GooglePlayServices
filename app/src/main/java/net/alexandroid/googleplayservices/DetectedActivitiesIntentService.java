@@ -20,14 +20,12 @@ public class DetectedActivitiesIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-        Intent localIntent = new Intent(Constatnts.BROADCAT_ACTION);
+        Intent localIntent = new Intent(Constatnts.BROADCAST_ACTION);
 
         ArrayList<DetectedActivity> detectedActivities = (ArrayList) result.getProbableActivities();
         Log.i(TAG, "activities detected");
 
         localIntent.putExtra(Constatnts.ACTIVITY_EXTRA, detectedActivities);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
-
-
     }
 }

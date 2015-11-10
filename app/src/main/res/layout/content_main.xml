@@ -26,4 +26,11 @@
         android:layout_height="wrap_content"
         android:text="Activity"
         android:id="@+id/tv_activity"/>
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_geofences"
+        android:id="@+id/addGeofences"/>
 </LinearLayout>
