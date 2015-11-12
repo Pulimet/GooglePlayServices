@@ -31,6 +31,9 @@
         <service
             android:name=".DetectedActivitiesIntentService"
             android:exported="false"/>
+        <service
+            android:name=".GeoFeneceTransitionsIntentService"
+            android:exported="false"/>
 
     </application>
 
